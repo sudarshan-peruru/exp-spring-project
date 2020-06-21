@@ -5,6 +5,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "user")
@@ -13,9 +16,12 @@ public class User {
 	@GeneratedValue
 	private Long id;
 	
+	//@NotNull(message="Username is null.")
+	@NotEmpty(message = "Username is empty.")
 	@Column(name="USER_NAME", length=50, nullable=false,unique=true)
 	private String username;
 	
+	@Size(min=2,message="First name should have min 2 char.")
 	@Column(name="FIRST_NAME", length=50, nullable=false)
 	private String firstname;
 	

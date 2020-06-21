@@ -3,10 +3,14 @@ package com.springproject.expproject.controllers;
 import java.util.List;
 import java.util.Optional;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,9 +23,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.springproject.expproject.entities.User;
 import com.springproject.expproject.exceptions.UserExistsException;
+import com.springproject.expproject.exceptions.UserNameNotFoundException;
 import com.springproject.expproject.exceptions.UserNotFoundException;
 import com.springproject.expproject.services.UserService;
 
+@Validated
 @RestController
 public class UserController {
 
@@ -34,7 +40,7 @@ public class UserController {
 	}
 	
 	@PostMapping("/users")
-	public ResponseEntity<Void> createUser(@RequestBody User user, UriComponentsBuilder builder) {
+	public ResponseEntity<Void> createUser(@Valid @RequestBody User user, UriComponentsBuilder builder) {
 		try {
 			 userService.createUser(user);
 			 HttpHeaders headers = new HttpHeaders();
@@ -46,7 +52,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/users/{id}")
-	public Optional<User> getUserByID(@PathVariable("id") Long id) {
+	public Optional<User> getUserByID(@PathVariable("id") @Min(1) Long id) {
 		try {
 			return userService.getUserByID(id);
 		}catch(UserNotFoundException ex) {
@@ -69,8 +75,13 @@ public class UserController {
 	}
 	
 	@GetMapping("/users/username/{name}")
-	public Optional<User> getUserByUsername(@PathVariable("name") String name) {
-		return userService.getUserByUsername(name);
+	public User getUserByUsername(@PathVariable("name") String name) throws UserNameNotFoundException{
+		try{
+			return userService.getUserByUsername(name);
+		}catch(UserNameNotFoundException e) {
+			//throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+			throw new UserNameNotFoundException(e.getMessage());
+		}
 	}
 }
 

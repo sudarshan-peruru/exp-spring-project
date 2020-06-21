@@ -10,6 +10,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.springproject.expproject.entities.User;
 import com.springproject.expproject.exceptions.UserExistsException;
+import com.springproject.expproject.exceptions.UserNameNotFoundException;
 import com.springproject.expproject.exceptions.UserNotFoundException;
 import com.springproject.expproject.repositories.UserRepository;
 
@@ -59,8 +60,11 @@ public class UserService {
 		return "Deleted user with ID: "+ID;
 	}
 	
-	public Optional<User> getUserByUsername(String username) {
-		return userRepository.findByUsername(username);
+	public User getUserByUsername(String username) throws UserNameNotFoundException {
+		User user = userRepository.findByUsername(username)
+					.orElseThrow(()->new UserNameNotFoundException("Username: "+ username + " not found in User repository."));
+		
+		return user;
 	}
 }
 
