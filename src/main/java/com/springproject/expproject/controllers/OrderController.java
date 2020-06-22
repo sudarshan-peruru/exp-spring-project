@@ -48,18 +48,15 @@ public class OrderController {
 	}
 	
 	@GetMapping("/{userID}/orders/{orderID}")
-	public Order getOrderByID(@PathVariable("userID") long uid,@PathVariable("orderID" ) long oid) throws UserNotFoundException {
-		Optional<User> userOp = userRep.findById(uid);
-		if(!userOp.isPresent()) {
-			throw new UserNotFoundException("User not found.");
+	public Optional<Order> getOrderByID(@PathVariable("userID") long uid,@PathVariable("orderID" ) long oid) throws UserNotFoundException {
+		
+		Optional <Order> order = orderRep.findByOrderidAndUserId(oid, uid);
+		if(!order.isPresent()) {
+			throw new UserNotFoundException("Order not found.");
+		}else {
+			return order;
 		}
-		List<Order> orders = userOp.get().getOrders();
-		for (Order order : orders) {
-			if (order.getOrderid() == oid) {
-				return order;
-			}
-		}
-		throw new UserNotFoundException("Order not found.");
+		
 	}
 }
 
